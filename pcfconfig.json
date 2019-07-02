@@ -1,0 +1,5 @@
+{
+    "outDir": "./out/controls"
+    , "allowJs": true
+    ,"compileOnSave" : true
+}

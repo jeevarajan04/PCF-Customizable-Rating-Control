@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="XRMControls" constructor="RatingControl" version="0.0.1" display-name-key="Rating_Display_Key" description-key="Rating_Desc_Key" control-type="standard">
+    <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
+    <property name="ratingDrpProperty" display-name-key="RatingDrp_Display_Key" description-key="RatingDrp_Desc_Key" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="ratingValueProperty" display-name-key="RatingValue_Display_Key" description-key="RatingValue_Desc_Key" of-type="Whole.None" usage="bound" required="true" />
+    <!-- 
+      Property node's of-type attribute can be of-type-group attribute. 
+      Example:
+      <type-group name="numbers">
+        <type>Whole.None</type>
+        <type>Currency</type>
+        <type>FP</type>
+        <type>Decimal</type>
+      </type-group>
+      <property name="sampleProperty" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type-group="numbers" usage="bound" required="true" />
+    -->
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="dist/Rating.css" order="1"/>
+      <!-- <css path ="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" order="1" /> -->
+      <!-- UNCOMMENT TO ADD MORE RESOURCES
+      <css path="css/RatingControl.css" order="1" />
+      <resx path="strings/RatingControl.1033.resx" version="1.0.0" />
+      -->
+    </resources>
+  </control>
+</manifest>
