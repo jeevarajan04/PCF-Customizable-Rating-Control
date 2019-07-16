@@ -1,42 +1,23 @@
 
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 
-import * as $ from 'jquery';
-
-let emoji = ["fas fa-dizzy", "fas fa-sad-tear", "fas fa-meh", "fas fa-smile", "fas fa-grin-stars"];
-let emojiCount = 0;
-let hoverNormal = ["#ff070747", "#ec700340", "#ffd50452", "#c2ff1d69", "#30ff0052"];
-let hoverHighlight = ["#ff0707", "#ec7003", "#ffd504", "#c2ff1d", "#30ff00"];
-let drpDown = ["line", "star", "heart", "emoji"];
-let list = [1, 2, 3, 4, 5];
-
 export class RatingControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
 	private _context: ComponentFramework.Context<IInputs>;
 	private _ratingDrpProperty: string;
 	private _ratingValueProperty: number;
+	private _ratingTotalNumberProperty: number;
+	private _ratingUnselectedColor: string;
+	private _ratingSelectedColor: string;
 	private _notifyOutputChanged: () => void;
 
-	private _select: HTMLDivElement;
 	private _container: HTMLDivElement;
 	private _div: HTMLDivElement;
 	private _span: HTMLSpanElement;
-	private _label: HTMLLabelElement;
+	private _labelRating: HTMLLabelElement;
 
-	private _css: HTMLLinkElement;
 
-	private _bootstrapScript: HTMLScriptElement;
-	private _bootstrapCss: HTMLLinkElement;
-
-	private _divRow: HTMLDivElement;
-	private _divColDummy: HTMLDivElement;
-	private _divCol: HTMLDivElement;
-	private _list_group: HTMLDivElement;
-	private _grid: HTMLDivElement;
-	private _grid_Item: HTMLDivElement;
-
-	private _selectDrp: HTMLSelectElement;
-	private _optionDrp: HTMLOptionElement;
+	private _fontAwesomeCss: HTMLLinkElement;
 
 	/**
 	 * Empty constructor.
@@ -54,85 +35,46 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 	 * @param container If a control is marked control-type='starndard', it will receive an empty div element within which it can render its content.
 	 */
 	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container: HTMLDivElement) {
+	
 		// Add control initialization code
 		this._context = context;
 		this._notifyOutputChanged = notifyOutputChanged;
-		this._ratingDrpProperty = context.parameters.ratingDrpProperty.raw != "" ? context.parameters.ratingDrpProperty.raw : "line";
-		this._ratingValueProperty = context.parameters.ratingValueProperty.raw != null ? context.parameters.ratingValueProperty.raw : 0;
-		
-		//Rating dropdown 
-		this._select = document.createElement("div");
-		this._selectDrp = document.createElement("select");
-		this._selectDrp.id = "selectDrp";
-		this._selectDrp.addEventListener("change", this.onDrpClick.bind(this));
-		drpDown.forEach(element => {
-			this._optionDrp = document.createElement("option");
-			this._optionDrp.value = String(element);
-			this._optionDrp.innerHTML = String(element);
-			this._optionDrp.id = element;
-			this._selectDrp.appendChild(this._optionDrp);
-		});
 
-		this._divRow = document.createElement("div");
-		this._divRow.setAttribute("class", "row");
+		this._ratingDrpProperty = context.parameters.ratingDrpProperty.raw != "" ? context.parameters.ratingDrpProperty.raw.trim() : "fas fa-star";
+		this._ratingValueProperty = context.parameters.ratingValueProperty.raw != 0 ? context.parameters.ratingValueProperty.raw : 0;
 
-		this._divColDummy = document.createElement("div");
-		this._divColDummy.setAttribute("class", "col-4");
-		this._divColDummy.appendChild(this._selectDrp);
-
-		this._divCol = document.createElement("div");
-		this._divCol.setAttribute("class", "col-6");
-
-		this._list_group = document.createElement("div");
-		this._list_group.className = "list-group";
-		this._grid = document.createElement("div");
-		this._grid.innerHTML = this._ratingDrpProperty.toString().toUpperCase() + " RATING";
-		this._grid.className = "list-group-item active " + this._ratingDrpProperty + "-rating-grid";
-		this._grid_Item = document.createElement("div");
-		this._grid_Item.className = "list-group-item line-rating-grid-item " + this._ratingDrpProperty + "-rating-grid-item";
-		this._grid_Item.id = "Grid_Item";
-
-		this._divRow.appendChild(this._divColDummy);
-		this._divRow.appendChild(this._divCol);
-		this._divCol.appendChild(this._list_group);
-		this._list_group.appendChild(this._grid);
-		this._list_group.appendChild(this._grid_Item);
-
+		this._ratingTotalNumberProperty = context.parameters.ratingTotalNumberProperty.raw != 0 ? context.parameters.ratingTotalNumberProperty.raw : 5;
+		this._ratingUnselectedColor = context.parameters.ratingUnselectedColorProperty.raw != "" ? context.parameters.ratingUnselectedColorProperty.raw.trim() : "#bbcefb";
+		this._ratingSelectedColor = context.parameters.ratingSelectedColorProperty.raw != "" ? context.parameters.ratingSelectedColorProperty.raw.trim() : "#007bff";
 		//Select Span 
-		for (let value of list) {
-			this._span = document.createElement("span");
-			this._span.setAttribute("value", String(value));
-			this._span.id = String(value);
-			var fontImage = this.fontImage(this._ratingDrpProperty);
-            var IsHover = this._ratingValueProperty>value ? "-hover" :"-normal" ;
-			this._span.className = fontImage + " fa-3x margin-right " + this._ratingDrpProperty + IsHover;
-			this._span.addEventListener("mouseover", this.onHover.bind(this, value));
-			this._select.appendChild(this._span);
-		}
 
 		this._container = document.createElement("div");
-		this._bootstrapCss = document.createElement("link");
-		this._css = document.createElement("link");
-		this._bootstrapScript = document.createElement("script");
 		this._div = document.createElement("div");
+		
+		// Testing purpose 
+		this._fontAwesomeCss = document.createElement("link");
+		this._fontAwesomeCss.rel = "stylesheet";
+		this._fontAwesomeCss.setAttribute("href", "https://use.fontawesome.com/releases/v5.8.2/css/all.css");
 
-		this._bootstrapScript.src = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js";
-		this._bootstrapCss.rel = "stylesheet";
-		this._bootstrapCss.setAttribute("href", "https://use.fontawesome.com/releases/v5.8.2/css/all.css");
+			for (var _ratingElement = 1; _ratingElement <= this._ratingTotalNumberProperty; _ratingElement++) {
+				let ratingIdValue = this._ratingDrpProperty.replace(" ","") + "_" + _ratingElement;
+				let classImage = this._ratingDrpProperty + " fa-3x margin-right " ;
+				this._span = document.createElement("span");
+				this._span.setAttribute("value", ratingIdValue);
+				this._span.id = ratingIdValue;
+				this._span.className = classImage;
+                this._span.style.color = (_ratingElement <= this._ratingValueProperty) ? this._ratingSelectedColor : this._ratingUnselectedColor ;
+				this._span.addEventListener("mouseover", this.onHover.bind(this,_ratingElement));
+				this._div.appendChild(this._span);
+			}
+		
+		this._labelRating = document.createElement("label");
+		this._labelRating.id = "labelRating";
+		this._labelRating.className = "label-fontsize";
 
-		this._css.rel = "stylesheet";
-		this._css.setAttribute("href", "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css");
-		this._container.appendChild(this._bootstrapScript);
-		this._container.appendChild(this._bootstrapCss);
-		this._container.appendChild(this._css);
+		this._container.appendChild(this._fontAwesomeCss);
 
-		this._grid_Item.appendChild(this._select);
-
-		this._label = document.createElement("label");
-		this._label.id = "label";
-		this._grid_Item.appendChild(this._label);
-
-		this._div.appendChild(this._divRow);
+		this._div.appendChild(this._labelRating);
 		this._container.appendChild(this._div);
 
 		container.appendChild(this._container);
@@ -140,74 +82,8 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 	}
 
 	onHover(value: any): void {
-		emojiCount = 0;
-		let drpDownValue = $("#selectDrp").val();
-		let list = [1, 2, 3, 4, 5];
-		let reverse: boolean = $("#" + value).hasClass(drpDownValue + "-normal");
-		if (value == 1 && reverse)
-			this._label.innerHTML = "";
-		else
-			this._label.innerHTML = value;
-
-		for (var row = 1; row <= list.length; row++) {
-			let switchClass: any = [];
-			if (row <= value)
-				switchClass = [drpDownValue + "-normal", drpDownValue + "-hover"];
-			else
-				switchClass = [drpDownValue + "-hover", drpDownValue + "-normal"];
-			if (switchClass) {
-				$("#" + row).removeClass(switchClass[0]);
-				$("#" + row).addClass(switchClass[1]);
-				if (drpDownValue == "emoji") {
-					if (row <= value) $("#" + row).css("color", hoverHighlight[emojiCount]);
-					else $("#" + row).css("color", hoverNormal[emojiCount]);
-					emojiCount++;
-				}
-			}
-		}
-
-		this._ratingValueProperty = value.toString();
+		 this._ratingValueProperty = value;
 		this._notifyOutputChanged();
-	}
-
-	onDrpClick() {
-
-		let selectDrp = $("#selectDrp").val();
-		this.drpOnchange(String(selectDrp));
-	}
-
-	fontImage(ratingDrpProperty: string): string {
-		switch (ratingDrpProperty) {
-			case "star": return "fas fa-star"
-			case "line": return "fas fa-minus"
-			case "heart": return "fa fa-heart"
-			default: return "fas fa-minus"
-		}
-	}
-
-	drpOnchange(selectDrp: String) {
-		this._label.innerHTML = "";
-		this._grid.innerHTML = selectDrp.toUpperCase() + " RATING";
-
-		this._grid.className = "list-group-item active " + selectDrp + "-rating-grid";
-		this._grid_Item.className = "list-group-item line-rating-grid-item " + selectDrp + "-rating-grid-item";
-		let list = [1, 2, 3, 4, 5];
-		let image = this.fontImage(selectDrp.toString());
-		list.forEach(element => {
-			$("#" + element).removeClass();
-			if (selectDrp != "emoji")
-				$("#" + element).addClass(image + " fa-3x margin-right " + selectDrp + "-normal");
-			else {
-				$("#" + element).addClass(emoji[emojiCount] + " fa-3x margin-right " + selectDrp + "-normal");
-				$("#" + element).css("color", hoverNormal[emojiCount]);
-				emojiCount++;
-			}
-		});
-
-		this._ratingDrpProperty = selectDrp.toString();
-		this._ratingValueProperty = 0;
-		this._notifyOutputChanged();
-
 	}
 
 	/**
@@ -216,9 +92,14 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): void {
 		// Add code to update control view
-		this._ratingDrpProperty = context.parameters.ratingDrpProperty.raw;
-		this._ratingValueProperty = context.parameters.ratingValueProperty.raw;
+		this._ratingValueProperty = context.parameters.ratingValueProperty.raw != 0 ? context.parameters.ratingValueProperty.raw : 0;
 		this._context = context;
+        this._labelRating.innerHTML = this._ratingValueProperty.toString() ; 
+		for (var _ratingElement = 1; _ratingElement <= this._ratingTotalNumberProperty; _ratingElement++) {
+			let _idValue = this._ratingDrpProperty.replace(" ","") + "_" + _ratingElement;
+			let _ratingelement: any = document.getElementById(_idValue);
+			_ratingelement.style.color = (_ratingElement <= this._ratingValueProperty) ? this._ratingSelectedColor : this._ratingUnselectedColor ;
+		}
 	}
 
 	/** 
@@ -227,7 +108,6 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 	 */
 	public getOutputs(): IOutputs {
 		return {
-			ratingDrpProperty: this._ratingDrpProperty,
 			ratingValueProperty: this._ratingValueProperty
 		};
 	}
