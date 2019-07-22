@@ -16,9 +16,6 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 	private _span: HTMLSpanElement;
 	private _labelRating: HTMLLabelElement;
 
-
-	private _fontAwesomeCss: HTMLLinkElement;
-
 	/**
 	 * Empty constructor.
 	 */
@@ -50,12 +47,7 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 
 		this._container = document.createElement("div");
 		this._div = document.createElement("div");
-		
-		// Testing purpose 
-		this._fontAwesomeCss = document.createElement("link");
-		this._fontAwesomeCss.rel = "stylesheet";
-		this._fontAwesomeCss.setAttribute("href", "https://use.fontawesome.com/releases/v5.8.2/css/all.css");
-
+     
 			for (var _ratingElement = 1; _ratingElement <= this._ratingTotalNumberProperty; _ratingElement++) {
 				let ratingIdValue = this._ratingDrpProperty.replace(" ","") + "_" + _ratingElement;
 				let classImage = this._ratingDrpProperty + " fa-3x margin-right " ;
@@ -72,8 +64,6 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 		this._labelRating.id = "labelRating";
 		this._labelRating.className = "label-fontsize";
 
-		this._container.appendChild(this._fontAwesomeCss);
-
 		this._div.appendChild(this._labelRating);
 		this._container.appendChild(this._div);
 
@@ -82,7 +72,7 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 	}
 
 	onHover(value: any): void {
-		 this._ratingValueProperty = value;
+		this._ratingValueProperty = value;
 		this._notifyOutputChanged();
 	}
 
@@ -94,7 +84,7 @@ export class RatingControl implements ComponentFramework.StandardControl<IInputs
 		// Add code to update control view
 		this._ratingValueProperty = context.parameters.ratingValueProperty.raw != 0 ? context.parameters.ratingValueProperty.raw : 0;
 		this._context = context;
-        this._labelRating.innerHTML = this._ratingValueProperty.toString() ; 
+        this._labelRating.innerHTML = this._ratingValueProperty.toString(); 
 		for (var _ratingElement = 1; _ratingElement <= this._ratingTotalNumberProperty; _ratingElement++) {
 			let _idValue = this._ratingDrpProperty.replace(" ","") + "_" + _ratingElement;
 			let _ratingelement: any = document.getElementById(_idValue);
